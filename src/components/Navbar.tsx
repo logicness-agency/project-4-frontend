@@ -21,6 +21,13 @@ export default function Navbar() {
       >
         Add Movie
       </Link>
+
+        <Link
+        to="/about"
+        className="px-3 py-1.5 rounded-md hover:bg-[#FAF1E1]/30 transition"
+      >
+        About
+      </Link>
     </nav>
   );
 }

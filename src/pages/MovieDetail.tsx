@@ -1,0 +1,92 @@
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+
+type Comment = { id: number; text: string; createdAt: string };
+type Movie = {
+  id: number;
+  title: string;
+  year?: number;
+  genre?: string;
+  imageUrl?: string;
+  comments: Comment[];
+};
+
+const API = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
+
+export default function MovieDetail() {
+  const { id } = useParams<{ id: string }>();
+  const [movie, setMovie] = useState<Movie | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [text, setText] = useState("");
+
+  async function loadMovie() {
+    try {
+      const res = await fetch(`${API}/movies/${id}`);
+      const data = await res.json();
+      setMovie(data);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function addComment(e: React.FormEvent) {
+    e.preventDefault();
+    if (!text.trim()) return;
+    await fetch(`${API}/movies/${id}/comments`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text }),
+    });
+    setText("");
+    loadMovie();
+  }
+
+  useEffect(() => {
+    loadMovie();
+  }, [id]);
+
+  if (loading) return <p className="text-white">Loading…</p>;
+  if (!movie) return <p className="text-white">Movie not found</p>;
+
+  return (
+    <main className="min-h-screen bg-black text-white px-6 py-10 flex flex-col items-center">
+      <div className="max-w-2xl w-full bg-[#1c1c1e]/80 backdrop-blur-sm border border-gray-700 rounded-lg shadow-lg p-6">
+        <h1 className="text-3xl font-bold mb-4">{movie.title}</h1>
+        {movie.imageUrl && (
+          <img src={movie.imageUrl} alt={movie.title} className="rounded-lg mb-6" />
+        )}
+        <p className="text-gray-400 mb-6">
+          {movie.year ?? "Unknown year"} • {movie.genre ?? "Unknown genre"}
+        </p>
+
+        <h2 className="text-xl font-semibold mb-3">Comments</h2>
+        <ul className="space-y-2 mb-4">
+          {movie.comments.map((c) => (
+            <li key={c.id} className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm">
+              {c.text}
+              <span className="block text-xs text-gray-500">
+                {new Date(c.createdAt).toLocaleString()}
+              </span>
+            </li>
+          ))}
+        </ul>
+
+        <form onSubmit={addComment} className="flex gap-2">
+          <input
+            type="text"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Write a comment…"
+            className="flex-1 px-3 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400"
+          />
+          <button
+            type="submit"
+            className="px-4 py-2 bg-white/10 rounded-lg font-semibold hover:bg-[#FAF1E1]/30 transition"
+          >
+            Add
+          </button>
+        </form>
+      </div>
+    </main>
+  );
+}

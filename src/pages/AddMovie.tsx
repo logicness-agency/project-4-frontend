@@ -5,8 +5,8 @@ export default function AddMovie() {
   const navigate = useNavigate();
 
   return (
-    <main className="flex items-center justify-center min-h-screen bg-black relative">
-      <div className="w-full max-w-md rounded-2xl p-8 shadow-2xl bg-white/5 backdrop-blur-lg border border-white/10">
+    <main className="flex items-center justify-center min-h-screen bg-black px-6">
+      <div className="w-full max-w-md rounded-2xl p-8 shadow-2xl bg-[#1c1c1e]/80 backdrop-blur-sm border border-gray-700">
         <h1 className="text-3xl font-bold mb-6 text-center text-white">
           Add New Movie
         </h1>

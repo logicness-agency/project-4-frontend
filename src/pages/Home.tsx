@@ -1,4 +1,5 @@
 import Prism from "../components/Prism";
+import { Link } from "react-router-dom";
 
 export default function Home() {
   return (
@@ -28,15 +29,17 @@ export default function Home() {
 
         <div className="flex space-x-4 pointer-events-auto">
 
+            <Link to="/movies">
             <button className="bg-white text-black font-semibold px-10 py-3 rounded-full shadow-md hover:opacity-90 transition">
               Start Rating
             </button>
-        
+            </Link >
 
-          
+          <Link to="/about">
             <button className="bg-white/10 border border-white/20 text-white px-10 py-3 rounded-full hover:bg-[#FAF1E1]/30 transition">
               Learn More
             </button>
+            </Link>
         
         </div>
       </div>
