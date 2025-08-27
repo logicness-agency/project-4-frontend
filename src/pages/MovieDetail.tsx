@@ -60,30 +60,30 @@ export default function MovieDetail() {
     );
 
   return (
-    <main className="min-h-screen bg-black text-white px-6 py-10 flex flex-col items-center">
-      <div className="w-full max-w-md bg-[#1c1c1e]/80 backdrop-blur-sm border border-gray-700 rounded-lg shadow-lg p-6">
-        <h1 className="text-2xl font-bold mb-4 text-center">{movie.title}</h1>
+    <main className="min-h-screen bg-black text-white px-4 py-8 flex flex-col items-center">
+      <div className="w-full max-w-sm bg-[#1c1c1e]/80 backdrop-blur-sm border border-gray-700 rounded-xl shadow-xl p-5">
+        <h1 className="text-xl font-semibold mb-3 text-center">{movie.title}</h1>
 
         {movie.imageUrl && (
-          <div className="flex justify-center mb-6">
+          <div className="flex justify-center mb-4">
             <img
               src={movie.imageUrl}
               alt={movie.title}
-              className="max-h-[400px] w-auto rounded-lg shadow-md"
+              className="max-h-64 w-auto rounded-md shadow"
             />
           </div>
         )}
 
-        <p className="text-gray-400 mb-6 text-center">
+        <p className="text-gray-400 mb-4 text-center text-sm">
           {movie.year ?? "Unknown year"} • {movie.genre ?? "Unknown genre"}
         </p>
 
-        <h2 className="text-lg font-semibold mb-3">Comments</h2>
-        <ul className="space-y-2 mb-4">
+        <h2 className="text-base font-medium mb-2">Comments</h2>
+        <ul className="space-y-2 mb-3">
           {movie.comments.map((c) => (
             <li
               key={c.id}
-              className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm"
+              className="bg-white/5 border border-white/10 rounded-md px-3 py-1.5 text-sm"
             >
               {c.text}
               <span className="block text-xs text-gray-500">
@@ -102,13 +102,13 @@ export default function MovieDetail() {
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Write a comment…"
-            className="flex-1 px-3 py-2 rounded-lg bg-white/10 border border-white/20 
-                       text-white placeholder-gray-400 focus:outline-none focus:ring-2 
+            className="flex-1 px-3 py-1.5 text-sm rounded-md bg-white/10 border border-white/20 
+                       text-white placeholder-gray-400 focus:outline-none focus:ring-1 
                        focus:ring-[#FAF1E1]/30"
           />
           <button
             type="submit"
-            className="px-4 py-2 bg-white/10 rounded-lg font-semibold hover:bg-[#FAF1E1]/30 transition"
+            className="px-3 py-1.5 text-sm bg-white/10 rounded-md font-medium hover:bg-[#FAF1E1]/30 transition"
           >
             Add
           </button>
