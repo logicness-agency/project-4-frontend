@@ -1,21 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
-type Movie = {
-  id: number;
-  title: string;
-  year?: number;
-  genre?: string;
-  imageUrl?: string;
-};
-
 const API = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
 export default function EditMovie() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [movie, setMovie] = useState<Movie | null>(null);
-
   const [title, setTitle] = useState("");
   const [year, setYear] = useState<number | "">("");
   const [genre, setGenre] = useState("");
@@ -23,148 +13,91 @@ export default function EditMovie() {
 
   useEffect(() => {
     (async () => {
-      try {
-        const res = await fetch(`${API}/movies/${id}`);
-        if (!res.ok) throw new Error("not found");
-        const data: Movie = await res.json();
-        setMovie(data);
-        setTitle(data.title ?? "");
-        setYear(data.year ?? "");
-        setGenre(data.genre ?? "");
-        setImageUrl(data.imageUrl ?? "");
-      } catch (e) {
-        console.error(e);
-      }
+      const res = await fetch(`${API}/movies/${id}`);
+      const data = await res.json();
+      setTitle(data.title ?? "");
+      setYear(data.year ?? "");
+      setGenre(data.genre ?? "");
+      setImageUrl(data.imageUrl ?? "");
     })();
   }, [id]);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSave(e: React.FormEvent) {
     e.preventDefault();
-    if (!title.trim()) return;
-
-    const payload = {
-      title: title.trim(),
-      year: year === "" ? undefined : Number(year),
-      genre: genre.trim() || undefined,
-      imageUrl: imageUrl.trim() || undefined,
-    };
-
-    const res = await fetch(`${API}/movies/${id}`, {
+    await fetch(`${API}/movies/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({ title, year: year === "" ? null : year, genre, imageUrl }),
     });
-
-    if (!res.ok) {
-      alert("Update failed");
-      return;
-    }
     navigate("/movies");
   }
 
   async function handleDelete() {
     if (!confirm("Delete this movie?")) return;
-    const res = await fetch(`${API}/movies/${id}`, { method: "DELETE" });
-    if (!res.ok) {
-      alert("Delete failed");
-      return;
-    }
+    await fetch(`${API}/movies/${id}`, { method: "DELETE" });
     navigate("/movies");
   }
 
-  if (!movie) {
-    return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <p className="text-gray-400">Loading…</p>
-      </div>
-    );
-  }
-
   return (
-    <main className="min-h-screen bg-black flex items-center justify-center px-6">
-      <div className="w-full max-w-md bg-[#1c1c1e]/80 backdrop-blur-sm border border-gray-700 rounded-lg shadow-lg p-6">
-        <h2 className="text-2xl font-bold text-center mb-6 text-white">Edit Movie</h2>
+    <main className="min-h-screen bg-black text-white flex items-center justify-center px-4">
+      <div className="w-full max-w-sm bg-[#1c1c1e]/80 p-6 rounded-xl shadow-xl border border-gray-700">
+        <h1 className="text-2xl font-semibold mb-4">Edit Movie</h1>
 
-        <form onSubmit={handleSubmit} className="space-y-4 text-left">
-          <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-300 mb-1">
-              Title
-            </label>
-            <input
-              id="title"
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-              className="w-full px-3 py-2 border bg-black/40 border-gray-600 rounded-md shadow-sm text-white focus:outline-none focus:ring-2 focus:ring-[#FAF1E1]/30"
-            />
-          </div>
+        <form onSubmit={handleSave} className="space-y-3">
+          <input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Title"
+            className="w-full px-3 py-2 text-sm bg-white/10 border border-white/15 rounded-md placeholder-white/50 focus:outline-none focus:ring-1 focus:ring-white/40"
+          />
+          <input
+            value={year}
+            type="number"
+            onChange={(e) => {
+              const v = e.target.value;
+              setYear(v === "" ? "" : Number(v));
+            }}
+            placeholder="Year"
+            className="w-full px-3 py-2 text-sm bg白/10 border border-white/15 rounded-md placeholder-white/50 focus:outline-none focus:ring-1 focus:ring-white/40"
+          />
+          <input
+            value={genre}
+            onChange={(e) => setGenre(e.target.value)}
+            placeholder="Genre"
+            className="w-full px-3 py-2 text-sm bg-white/10 border border-white/15 rounded-md placeholder-white/50 focus:outline-none focus:ring-1 focus:ring-white/40"
+          />
+          <input
+            value={imageUrl}
+            onChange={(e) => setImageUrl(e.target.value)}
+            placeholder="Image URL"
+            className="w-full px-3 py-2 text-sm bg-white/10 border border-white/15 rounded-md placeholder-white/50 focus:outline-none focus:ring-1 focus:ring-white/40"
+          />
 
-          <div>
-            <label htmlFor="year" className="block text-sm font-medium text-gray-300 mb-1">
-              Year
-            </label>
-            <input
-              id="year"
-              type="number"
-              value={year}
-              onChange={(e) => setYear(e.target.value === "" ? "" : Number(e.target.value))}
-              className="w-full px-3 py-2 border bg-black/40 border-gray-600 rounded-md shadow-sm text-white focus:outline-none focus:ring-2 focus:ring-[#FAF1E1]/30"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="genre" className="block text-sm font-medium text-gray-300 mb-1">
-              Genre
-            </label>
-            <input
-              id="genre"
-              type="text"
-              value={genre}
-              onChange={(e) => setGenre(e.target.value)}
-              className="w-full px-3 py-2 border bg-black/40 border-gray-600 rounded-md shadow-sm text-white focus:outline-none focus:ring-2 focus:ring-[#FAF1E1]/30"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-300 mb-1">
-              Image URL
-            </label>
-            <input
-              id="imageUrl"
-              type="url"
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-              className="w-full px-3 py-2 border bg-black/40 border-gray-600 rounded-md shadow-sm text-white focus:outline-none focus:ring-2 focus:ring-[#FAF1E1]/30"
-            />
-          </div>
-
-          <div className="flex gap-4 mt-6">
+          <div className="flex items-center justify-between pt-2">
             <button
               type="button"
-              onClick={() => navigate("/movies")}
-              className="flex-1 px-4 py-2 rounded-md border border-gray-600 text-gray-300 hover:bg-[#FAF1E1]/10 transition"
+              onClick={handleDelete}
+              className="px-3 py-1.5 text-sm rounded-md bg-red-600 hover:bg-red-700"
             >
-              Cancel
+              Delete
             </button>
-            <button
-              type="submit"
-              className="flex-1 px-4 py-2 rounded-md bg-white/10 text-white font-semibold hover:bg-[#FAF1E1]/30 transition"
-            >
-              Save Changes
-            </button>
+            <div className="space-x-2">
+              <button
+                type="button"
+                onClick={() => navigate("/movies")}
+                className="px-3 py-1.5 text-sm rounded-md bg-white/10 hover:bg-white/15"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-3 py-1.5 text-sm rounded-md bg-white/10 hover:bg-[#FAF1E1]/30"
+              >
+                Save
+              </button>
+            </div>
           </div>
         </form>
-
-        <div className="mt-6">
-          <button
-            type="button"
-            onClick={handleDelete}
-            className="w-full px-4 py-2 rounded-md bg-red-600 text-white font-semibold hover:bg-red-700 transition"
-          >
-            Delete Movie
-          </button>
-        </div>
       </div>
     </main>
   );
